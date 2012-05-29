@@ -1,0 +1,101 @@
+"=============================================================================
+"     FileName: .muttatorrc
+"         Desc: Config file for Muttator
+"       Author: QiWei
+"        Email: qiwei201@gmail.com
+"     HomePage: 
+"      Version: 1.1
+"   LastChange: 2011-12-04 16:28:46
+"      History: 1.1 (created: 2011/11/13 17:32:11)
+"				
+"=============================================================================
+
+source! "F:\\Users\\.muttatorrc.local"
+
+" Initialize: {{{1
+javascript <<EOF
+/*
+	if (typeof(window.dactyl) == "object") {
+		liberator = dactyl;
+		liberator.globalVariables = dactyl.globalVariables;
+		useVimperator = false;
+		usePentadactyl = true;
+	}
+	else {
+		dactyl = liberator;
+		dactyl.globalVariables = liberator.globalVariables;
+		content.getSelection = window.getSelectionk
+		useVimperator = true;
+		usePentadactyl = false;
+	}
+	*/
+EOF
+
+" Environment Variable: {{{2
+javascript <<EOF
+	var nsiProfD = services.get("directory").get("ProfD", Ci.nsIFile);
+	var nsiCurProcD = services.get("directory").get("CurProcD", Ci.nsIFile);
+	var homePath =  nsiProfD.path.indexOf("Portable") != -1
+		? nsiProfD.parent.path + ((nsiProfD.path.search(/\\/) != -1) ? "\\" : "/") + "settings"
+		: nsiProfD.path;
+	// 所在的盘符.
+	var drive = nsiCurProcD.path.substr(0, 2);
+	//services.get("environment").set("HOME",  home);
+	services.get("environment").set("PortableAppsDrive",  drive);
+	services.get("environment").set("ProgramDirectory",  drive + "\\Program Files");
+	services.get("environment").set("MOZ_PAC_PATH", drive + "\\Program Files\\Proxy");
+EOF
+
+" GPRS: {{{2
+javascript <<EOF
+function getGPRSFile (PhoneNumber) {
+	var env = Components.classes["@mozilla.org/process/environment;1"].
+			  getService(Components.interfaces.nsIEnvironment);
+	var localFile = Components.classes["@mozilla.org/file/local;1"]
+					.createInstance(Components.interfaces.nsILocalFile);
+
+	//Win7下默认的存放位置
+	var attachmentPath = "F:\\Users\\Documents\\ACE\\" + PhoneNumber + ".zip";
+
+	//指向我的文档的环境变量存在时重新定位文件
+	if (env.exists("Personal")) {
+		attachmentPath = env.get("Personal") + "\\ACE\\" + PhoneNumber + ".zip";
+	}
+	localFile.initWithPath(attachmentPath);
+
+	return localFile
+}
+
+//https://developer.mozilla.org/en/Extensions/Thunderbird/HowTos
+function addGPRSAttachment() {
+	var PhoneNumber = "";
+	var msgSubject = document.getElementById("msgSubject").value;
+
+	//https://developer.mozilla.org/en/XPCOM_Interface_Reference/NsIEditor
+	var editor = GetCurrentEditor();  
+	var editor_type = GetCurrentEditorType();
+
+	//AString outputToString(in AString formatType, in unsigned long flags);
+	//https://developer.mozilla.org/en/XPCOM_Interface_Reference/NsIEditor#Methods
+	var msgBody = editor.outputToString('text/plain', 8);
+
+	if (/\d{11}/.test(msgSubject)) {
+		PhoneNumber = msgSubject.replace(/.*?(\d{11}).+/, "$1");
+	}
+	else if (/\d{11}/.test(msgBody)) {
+		PhoneNumber = msgBody.replace(/\r|\n/g).replace(/.*?(\d{11}).+/, "$1");
+	}
+
+	if (/\d{11}/.test(PhoneNumber)) {
+		var file = getGPRSFile(PhoneNumber);
+
+		//添加附件
+		//chrome\messenger\content\messenger\messengercompose\MsgComposeCommands.js
+		AddFileAttachment(file);
+	}
+}
+EOF
+
+"}}}
+
+" vim: set sw=4 ts=4 sts=4 ft=vim syntax=vim foldmethod=marker:

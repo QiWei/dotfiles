@@ -1,0 +1,289 @@
+" 建立 s:bundles 变量，就可以自定选项，减少对 bundle plugin 依赖。
+if len(split(globpath(&rtp, 'autoload/neobundle.vim'), "\n")) == 1
+	let s:bundles = [
+		\ 	['Shougo/neobundle.vim'],
+		\ ]
+elseif len(split(globpath(&rtp, 'autoload/vundle.vim'), "\n")) == 1
+	let s:bundles = [
+		\   ['gmarik/vundle'],
+		\ ]
+endif
+
+" let s:bundles += [
+      " \   ['bootleq/vim-gitdiffall', {":prefer_local": 1}],
+      " \   ['nginx.vim'],
+      " \ ]
+
+
+
+" let Vundle manage Vundle
+" Bundle 'gmarik/vundle'
+
+" Bundle 'tpope/vim-pathogen'
+" Bundle 'tomtom/tplugin_vim'
+
+"--------------------------------------------------
+" => Bundle: github  {{{
+" original repos on github
+"--------------------------------------------------
+
+	" UI Additions {{{
+	let s:bundles += [
+		\ 	['roman/golden-ratio'],
+		\ 	['chrisbra/NrrwRgn'],
+		\ 	['kien/rainbow_parentheses.vim'],
+		\ 	['mutewinter/vim-indent-guides'],
+		\ ]
+	if has('win32') || has('win64')
+		if has("gui_running")
+			let s:bundles += [
+			\ 	['Lokaltog/vim-powerline'],
+			\ ]
+		else
+		endif
+	endif
+		" colorscheme: {{{
+		let s:bundles += [
+		\ 	['nanotech/jellybeans.vim', {":skip": 1}],
+		\ 	['trapd00r/neverland-vim-theme', {":skip": 1}],
+		\ 	['altercation/vim-colors-solarized'],
+		\ 	['chriskempson/vim-tomorrow-theme', {":skip": 1}],
+		\ 	['int3/vim-vividchalk', {":skip": 1}],
+		\ ]
+		" }}}
+	" }}}
+
+	" Navigation {{{
+	let s:bundles += [
+		\ 	['mileszs/ack.vim', {":skip": 1}],
+		\ 	['bkad/CamelCaseMotion', {":skip": 1}],
+		\ 	['kien/ctrlp.vim', {":skip": 1}],
+		\ 	['sjl/gundo.vim'],
+		\ 	['scrooloose/nerdtree', {":skip": 1}],
+		\ 	['majutsushi/tagbar', {":skip": 1}],
+		\ 	['Shougo/unite.vim', {":skip": 1}],
+		\ 	['Townk/vim-autoclose', {":skip": 1}],
+		\ 	['Lokaltog/vim-easymotion'],
+		\ 	['tpope/vim-fugitive'],
+		\ 	['michaeljsmith/vim-indent-object', {":skip": 1}],
+		\ 	['int3/vim-taglist-plus'],
+		\ 	['tpope/vim-unimpaired', {":skip": 1}],
+		\ 	['benmills/vimux', {":skip": 1}],
+		\ ]
+	" }}}
+
+	" Commands {{{
+	let s:bundles += [
+		\ 	['scrooloose/nerdcommenter'],
+		\ 	['xuhdev/SingleCompile', {":skip": 1}],
+		\ 	['AndrewRadev/splitjoin.vim', {":skip": 1}],
+		\ 	['godlygeek/tabular'],
+		\ 	['tpope/vim-abolish', {":skip": 1}],
+		\ 	['kana/vim-smartinput', {":skip": 1}],
+		\ 	['tpope/vim-surround', {":skip": 1}],
+		\ ]
+	" }}}
+
+	" Automatic Helper {{{
+	let s:bundles += [
+		\ 	['Raimondi/delimitMate', {":skip": 1}],
+		\ 	['Shougo/neocomplcache', {":skip": 1}],
+		\ 	['ervandew/supertab'],
+		\ 	['scrooloose/syntastic'],
+		\ 	['SirVer/ultisnips', {":skip": 1}],
+		\ 	['garbas/vim-snipmate'],
+		\ ]
+	" }}}
+
+	" Language related {{{
+		\ 	['chrisbra/csv.vim', {":skip": 1}],
+		\ 	['joestelmach/javaScriptLint.vim', {":skip": 1}],
+		\ 	['hallettj/jslint.vim', {":skip": 1}],
+		\ 	['gregsexton/MatchTag', {":skip": 1}],
+		\ 	['kevinw/pyflakes-vim', {":skip": 1}],
+		\ 	['jiangmiao/simple-javascript-indenter', {":skip": 1}],
+	" Bundle 
+	let s:bundles += [
+		\ 	['rstacruz/sparkup', {'rtp': 'vim/'}],
+		\ 	['hotoo/template.vim'],
+		\ 	['maksimr/vim-jsbeautify', {":skip": 1}],
+		\ 	['swaroopch/vim-markdown-preview', {":skip": 1}],
+		\ 	['tpope/vim-rails', {":skip": 1}],
+		\ 	['tomtom/viki_vim', {":skip": 1}],
+		\ 	['sukima/xmledit', {":skip": 1}],
+		\ 	['mattn/zencoding-vim'],
+		\ ]
+
+	" }}}
+
+	" Syntax {{{
+	let s:bundles += [
+		\ 	['ChrisYip/Better-CSS-Syntax-for-Vim'],
+		\ 	['PProvost/vim-ps1'],
+		\ 	['int3/nicer-vim-regexps', {":skip": 1}],
+		\ ]
+	" }}}
+
+	" Doc {{{
+	let s:bundles += [
+		\ 	['chrisbra/vim_faq', {":skip": 1}],
+		\ ]
+	" }}}
+
+	" Utilities {{{
+	let s:bundles += [
+		\ 	['lilydjwg/colorizer', {":skip": 1}],
+		\ 	['Rykka/ColorV', {":skip": 1}],
+		\ 	['hotoo/googletranslate-vim', {":skip": 1}],
+		\ 	['ujihisa/tabpagecolorscheme', {":skip": 1}],
+		\ 	['ujihisa/unite-colorscheme', {":skip": 1}],
+		\ 	['thinca/vim-fontzoom', {":skip": 1}],
+		\ 	['ynkdir/vim-iconv', {":skip": 1}],
+		\ 	['thinca/vim-quickrun', {":skip": 1}],
+		\ 	['xolox/vim-shell', {":skip": 1}],
+		\ 	['gregsexton/VimCalc', {":skip": 1}],
+		\ 	['vimim/vimim'],
+		\ 	['Shougo/vimproc'],
+		\ 	['Shougo/vimshell'],
+		\ 	['guns/xterm-color-table.vim', {":skip": 1}],
+		\ ]
+	" }}}
+
+	" Game {{{
+	let s:bundles += [
+		\ 	['theshadowhost/Clippo', {":skip": 1}],
+		\ ]
+	" }}}
+
+	" Others {{{
+	let s:bundles += [
+		\ 	['honza/snipmate-snippets'],
+		\ 	['tomtom/tlib_vim'],
+		\ 	['MarcWeber/vim-addon-mw-utils'],
+		\ 	['xolox/vim-easytags'],
+		\ 	['tpope/vim-repeat'],
+		\ ]
+	" }}}
+
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""}}}
+
+
+"--------------------------------------------------
+" => Bundle: vim-scripts {{{
+" vim-scripts repos
+"--------------------------------------------------
+
+" Bundle 'Align'
+
+" syntax
+" Bundle 'fluxbox.vim'
+" Bundle 'Markdown'
+" Bundle 'bbcode'
+
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""}}}
+
+"--------------------------------------------------
+" => Bundle: git {{{
+" non github repos
+"--------------------------------------------------
+
+" Bundle 'git://git.wincent.com/command-t.git'
+
+
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""}}}
+
+"--------------------------------------------------
+" => Bundle: bzr {{{
+"--------------------------------------------------
+
+" http://www.vim.org/scripts/script.php?script_id=2715
+" http://bazaar.launchpad.net/~sirver/ultisnips/trunk/
+" https://github.com/SirVer/ultisnips
+" bzr branch lp:~sirver/ultisnips/trunk
+" Bundle 'UltiSnips'
+
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""}}}
+
+"--------------------------------------------------
+" => Bundle: hg {{{
+"--------------------------------------------------
+
+" Bundle 'FuzzyFinder'
+" http://www.vim.org/scripts/script.php?script_id=1984
+" https://bitbucket.org/ns9tks/vim-fuzzyfinder
+" hg clone https://bitbucket.org/ns9tks/vim-fuzzyfinder
+let s:bundles += [
+	\ 	['https://bitbucket.org/ns9tks/vim-fuzzyfinder'],
+	\ ]
+
+" http://www.vim.org/scripts/script.php?script_id=3115
+" https://github.com/xuhdev/SingleCompile
+" https://github.com/vim-scripts/SingleCompile
+" hg clone https://bitbucket.org/xuhdev/singlecompile
+" Bundle 'singlecompile'
+
+" http://www.vim.org/scripts/script.php?script_id=1879
+" hg clone https://bitbucket.org/ns9tks/vim-autocomplpop
+let s:bundles += [
+	\ 	['vim-autocomplpop'],
+	\ ]
+
+" http://www.vim.org/scripts/script.php?script_id=3252
+" hg clone https://bitbucket.org/ns9tks/vim-l9
+let s:bundles += [
+	\ 	['vim-l9'],
+	\ ]
+
+" http://www.vim.org/scripts/script.php?script_id=2226
+" hg clone https://code.google.com/p/vimwiki/
+" Bundle 'vimwiki'
+
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""}}}
+
+"--------------------------------------------------
+" => Bundle: svn {{{
+"--------------------------------------------------
+
+" http://vim.sourceforge.net/scripts/script.php?script_id=2506
+" https://github.com/vimim/
+" svn http://vimim.googlecode.com/svn/trunk
+" Bundle 'VimIM'
+
+" http://www.vim.org/scripts/script.php?script_id=760
+" svn checkout http://peaksea.googlecode.com/svn/trunk/ peaksea
+" Bundle 'peaksea'
+
+" http://www.vim.org/scripts/script.php?script_id=2771
+" svn checkout http://conque.googlecode.com/svn/trunk conque
+" Bundle 'conque'
+
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""}}}
+
+" 自定义选项有 :skip 和 :prefer_local。
+" :skip 就是不要装，因为写成数组就不能直接注释掉一行了……
+" :prefer_local 则是为了测试 plugin 方便，如果这个 plugin 有一份 repository 装在
+" ~/repository，那就是我自己乱改的版本，请 NeoBundle 还是要读它，但更新的时候要
+" 跳过。
+" {{{
+for bundle in s:bundles
+	let s:tmp_options = get(bundle, 1, {})
+	if get(s:tmp_options, ":skip")
+		continue
+	elseif get(s:tmp_options, ":prefer_local")
+		if isdirectory(fnamemodify('~/repository/' . split(bundle[0], '/')[-1], ':p'))
+			let s:tmp_options = {"base": '~/repository', "type": "nosync"}
+		endif
+	endif
+
+	call filter(s:tmp_options, "v:key[0] != ':'")
+
+	if exists(":NeoBundle")
+		execute "NeoBundle " . string(bundle[0]) . (empty(s:tmp_options) ? '' : ', ' . string(s:tmp_options))
+	else
+		execute "Bundle " . string(bundle[0]) . (empty(s:tmp_options) ? '' : ', ' . string(s:tmp_options))
+	endif
+endfor
+unlet! s:bundles s:tmp_options
+" }}}
+
+" vim: set sw=4 ts=4 sts=4 ft=vim syntax=vim foldmethod=marker foldlevel=0:

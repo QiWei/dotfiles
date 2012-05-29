@@ -1,0 +1,54 @@
+
+	" let g:vim_addon_manager['plugin_sources']['VimIM'] = {"type":"svn", "url":"http://vimim.googlecode.com/svn/trunk"}
+	call vam#ActivateAddons(['AutoComplPop'])
+	call vam#ActivateAddons(['vim-addon-manager-known-repositories','vim-addon-mw-utils'])
+
+	fun SetupVAM() " {{{3
+		call vam#ActivateAddons([
+					\ 'Align294',
+					\ 'AutoComplPop',
+					\ 'calendar52',
+					\ 'Color_Sampler_Pack',
+					\ 'Color_Scheme_Explorer',
+					\ 'Conque_Shell',
+					\ 'EnhCommentify',
+					\ 'FencView',
+					\ 'FuzzyFinder',
+					\ 'grep',
+					\ 'HTML.zip',
+					\ 'iconv',
+					\ 'Mark2666',
+					\ 'matchit.zip',
+					\ 'neocomplcache',
+					\ 'OmniCppComplete',
+					\ 'quickrun3146',
+					\ 'shell',
+					\ 'Simple_Javascript_Indenter',
+					\ 'SingleCompile',
+					\ 'snipMate',
+					\ 'snipmate-snippets',
+					\ 'snippetsEmu',
+					\ 'supertab',
+					\ 'surround',
+					\ 'Tagbar',
+					\ 'taglist-plus',
+					\ 'The_NERD_Commenter',
+					\ 'The_NERD_tree',
+					\ 'tplugin',
+					\ 'TxtBrowser',
+					\ 'UltiSnips',
+					\ 'vim-addon-actions',
+					\ 'vim_easymotion',
+					\ 'VimCalc',
+					\ 'VimIM',
+					\ 'vimshell',
+					\ 'vimwiki',
+					\ 'VisIncr',
+					\ 'VOoM',
+					\ 'ZenCoding'
+					\ ])
+	endf
+	
+	" }}}3
+
+" vim: set sw=4 ts=4 sts=4 ft=vim syntax=vim foldmethod=marker foldlevel=0:

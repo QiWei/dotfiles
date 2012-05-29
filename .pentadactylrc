@@ -1,0 +1,1125 @@
+" 	+------------------------------------------------+
+" 	|   FileName: .pentadactylrc
+" 	|Description: Config file for vimperator         |
+" 	|     Author: QiWei <QiWei.Email@gmail.com>      |
+" 	| LastChange: 2012-04-21 15:13:24
+" 	|     Readme:                                    |
+" 	|      Usage:                                    |
+" 	+------------------------------------------------
+" =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+
+" Initialize: {{{1
+javascript <<EOF
+/*
+	if (typeof(window.dactyl) == "object") {
+		liberator = dactyl;
+		liberator.globalVariables = dactyl.globalVariables;
+		useVimperator = false;
+		usePentadactyl = true;
+	}
+	else {
+		dactyl = liberator;
+		dactyl.globalVariables = liberator.globalVariables;
+		content.getSelection = window.getSelectionk
+		useVimperator = true;
+		usePentadactyl = false;
+	}
+	*/
+EOF
+
+" ---------------------------------------------------------------------
+" Environment Variable: {{{2
+javascript <<EOF
+	var nsiProfD = services.directory.get("ProfD", Ci.nsIFile);
+	var nsiCurProcD = services.directory.get("CurProcD", Ci.nsIFile);
+	var homePath =  nsiProfD.path.indexOf("Portable") != -1
+		? nsiProfD.parent.path + ((nsiProfD.path.search(/\\/) != -1) ? "\\" : "/") + "settings"
+		: nsiProfD.path;
+	// Firefox 所在的盘符.
+	var drive = nsiCurProcD.path.substr(0, 2);
+	//services.get("environment").set("HOME",  home);
+	services.environment.set("PortableAppsDrive",  drive);
+	services.environment.set("ProgramDirectory",  drive + "\\Program Files");
+	services.environment.set("MOZ_PAC_PATH", drive + "\\Program Files\\Proxy");
+	//services.environment.set("MOZ_APP_PATH", getFirefoxDirectory());
+	var MOZ_PLUGIN_PATH = services.environment.get("MOZ_PLUGIN_PATH");
+	if (MOZ_PLUGIN_PATH == "") {
+		services.environment.set("MOZ_PLUGIN_PATH", MOZ_PLUGIN_PATH + ";" + drive + "\\PortableApps\\FirefoxPortable\\Data\\plugins");
+	}
+EOF
+
+" 插件存放
+" runtimepath默认值是$PENTADACTYL_RUNTIME，如果没设置，windows系统下则是
+" $HOME/pentadactyl，其他系统下是（$HOME/.pentadactyl）所以，在windows下，默认情
+" 况插件应该放在$HOME/pentadactyl/plugins文件夹里。
+" set runtimepath+=$HOME/.vimperator
+set runtimepath+=$HOME/.pentadactyl
+
+
+" =================================================
+" Options: {{{1
+" =================================================
+" set guioptions=bCrsN
+" 显示标签编号，n是在site icon后显示，N是在icon上，建议用n，N会遮盖图标
+" set guioptions+=N
+set guioptions+=n
+" set hintkeys=abcefhilmnopqrsuvwxyz
+" set hinttimeout=500
+" set mapleader=,
+set titlestring=Mozilla\ Firefox
+colorscheme zenburn
+
+set defsearch=googlesslnoinstant
+" set strictfocus=google.com:laissez-faire,'chrome:*':laissez-faire,*:moderate
+" set strictfocus=*:moderate
+set hlfind
+" set showtabline=multitab
+" set tabclose=opener,previous,left,right
+" set tabopen=link:right,orphan:end,external:end
+
+" set passunknown=caret,output_multiline,!normal,base
+
+" 翻页: {{{2
+" pentadactyl
+" 上一页关键字
+" '\bprev|previous\b',^<$,'^(<<|«)$','^(<|«)','(<|«)$'
+" 上一页|上一頁|上1页|上1頁|上页|上頁|翻上頁|翻上页|上一张|上一張|上一幅|上一章|上一节|上一節|上一篇|前一页|前一頁|后退|後退|上篇
+" set previouspattern&
+set previouspattern='((翻)?(上|前|(后|後)退)(一|1)?(页|頁|张|張|幅|章|节|節|篇)|(后|後)退)','\bprev|previous\b',^<$,'^(<<|«)$','^(<|«)','(<|«)$','Newer'
+
+" 下一页关键字
+" '\bnext\b',^>$,'^(>>|»)$','^(>|»)','(>|»)$','\bmore\b'
+" ^下一页|下一頁|下1页|下1頁|下页|下頁|翻页|翻頁|翻下頁|翻下页|下一张|下一張|下一幅|下一章|下一节|下一節|下一篇|后一页|後一頁|前进|下篇|后页|往后|NextPage
+" set nextpattern&
+set nextpattern='((翻|往)?(下|后|後|前进)?(一|1)?(页|頁|张|張|幅|章|节|節|篇)|前进)','\bnext',^>$,'^(>>|»)$','^(>|»)','(>|»)$','\bmore\b','Older'
+
+" set previouspattern='^\s*[上前][一]?[页张个篇章节步封]\s*,'^\s*(较新的文章)\s*,^<<<$,^(prev|Prev|previous|Previous)$,^<$,^(<<|«|‹‹)$,^(<|«),(<|«)$
+" set nextpattern='^\s*[下后][一]?[页张个篇章节步封]\s*,'^\s*(较旧的文章)\s*,^>>>$,^(next|Next)$,^>$,^(>>|››|»)$,^(>|»),(>|»)$,'\bmore\b'
+" }}}2
+
+" ---------------------------------------------------------------------
+" Setting Firefox options: {{{2
+if prefs.get("extensions.pentadactylrc.firsttime", true) || prefs.get("extensions.vimperatorrc.firsttime", true)
+	source ~/pentadactyl/_pref
+endif
+" }}}2
+
+" ---------------------------------------------------------------------
+" Style Option: {{{2
+" 高亮当前标签
+" hi -a BufTabSelected        color:#2e3330; background-color:#88b090; padding:0 4px;
+" hi -a BufTabs               margin:0 4px; overflow:hidden;
+" hi -a BufTab                padding:0 2px;
+
+" 命令行输入时禁用输入法
+style chrome://* #dactyl-commandline-command input {ime-mode: inactive;}
+style chrome://* #dactyl-statusline-field-commandline-command input {ime-mode: inactive;}
+
+javascript <<EOF
+	//取消pentadactyl添加到appmenu上的小图标
+	document.getElementById("appmenu-button").image = "";
+EOF
+
+" 使用这个样式可以使编号更醒目（字体大号、加粗、大写 – 输入时用
+" hi Hint font-family: Verdana; font-size: 10px; font-weight: bold;
+"			\ color: black; background-color: rgba(255,255,0,0.5);
+"			\ border-color: ButtonShadow
+" hi Hint font:bold 10px "Droid Sans Mono", monospace !important; margin:-.2ex;
+"			\ padding: 0 0 0 1px; outline:1px solid rgba(0, 0, 0, .5);
+"			\ background:rgba(255, 248, 231, .8); color:black;
+"			\ text-transform:uppercase;
+
+
+" }}}2
+
+" Site Option: {{{2
+" 针对站点自定义
+" group google -description "Google normal/visial mode" -locations=mail.google.com,www.google.com/reader,plus.google.com
+" nnoremap -group=google C <pass-next-key><Esc>
+" nnoremap -group=google gi <Pass>
+" nnoremap -group=google gs <Pass>
+" nnoremap -group=google gt <Pass>
+" nnoremap -group=google gd <Pass>
+" nnoremap -group=google gc <Pass>
+" nnoremap -group=google gb <Pass>
+" nnoremap -group=google gk <Pass>
+" nnoremap -group=google gl <Pass>
+
+" allow scrolling in ggl apps
+" nnoremap -group=google J <Down>
+" nnoremap -group=google K <Up>
+
+" passkeys {{{3
+" passkeys的值类型从1.0b6版本已经由regexpmap更改为sitemap，完整的定义是这样的
+" {Site Filters}:{Passed Keys},{Site Filters}:{Passed Keys}
+" 参考：http://www.slimeden.com/2011/03/firefox/pentadactyl#options
+
+" domain
+" 通过域名这种方式可以匹配该域名及其子域名下的所有站点
+set passkeys+=groups.google.com:aAjJkKnNoOpPu?,gl,gm,gs
+set passkeys+=mail.google.com:jkLnoprsuz/*.,gi,gs
+set passkeys+=twitter.com:rn?jk/.<Space>,<Esc>,gh,gr,gp
+" set passkeys+='mail.google.com':xsem!#*rRaAvN[]{}z.IU=-gidac/?lujkonp
+" set passkeys+='www.google.com/reader':xsem!#*rRaAvN[]{}z.IU=-gidac/?lujkonp
+
+" URL prefix
+" 一个“URL前缀”表示有两点要求，1要以协议名开头，比如http，https；2要以*号结尾。
+" 因为协议名后的:号与{Site Filters}:{Passed Keys}中的:号冲突，所以URL prefix需要用引号括起
+set passkeys+="https://www.google.com/reader/*":AjkmnNoOpPvX<Space><S-Space>,gh,ga,gF,gu
+
+" Full URL
+" 以协议名开始而不以*结尾的URL就是一个完整的URL，只匹配这个完整的URL
+
+" Regular expression
+" 不是上述三种情况的时候都理解成正则表达式，正则表达式要注意转义，否则不能工作。
+" 另外要注意，因为解析的时候优先按照前三种来，所以有时候直接写正则表达式可能会不工作。
+set passkeys+=www\.google\.com/calendar/.*:jk12345cezq
+" set passkeys+=www\.google\.com/search.*:jk
+" }}}3
+
+" }}}2
+
+
+" }}}1
+
+" =================================================
+" QMarks: {{{1
+" =================================================
+silent qmark q http://mail.qq.com/
+silent qmark n http://www.google.com/ncr
+silent qmark e https://encrypted.google.com/webhp?hl=zh-CN
+silent qmark g http://www.google.com/webhp?hl=zh-CN
+silent qmark s https://www.google.com/webhp?hl=zh-CN
+silent qmark m https://mail.google.com/
+silent qmark r https://www.google.com/reader
+silent qmark t https://twitter.com/
+
+" =================================================
+" BMarks: {{{1
+" =================================================
+
+" =================================================
+" Keyboard shortcuts: {{{1
+" =================================================
+" 界面控制相关Keymaps: {{{2
+" ---------------------------------------------------------------------
+" Toggle the menubar: {{{3
+nnoremap <S-Up> :set go-=mT<CR>
+nnoremap <S-Down> :set go+=mT<CR>
+inoremap <S-Up> <Esc>:set go-=mT<CR>gi
+inoremap <S-Down> <Esc>:set go+=mT<CR>gi
+
+" Toggle the tabsbar: {{{3
+nnoremap <C-Up> :set showtabline=0<CR>
+nnoremap <C-Down> :set showtabline=2<CR> 
+inoremap <C-Up> <Esc>:set showtabline=0<CR>gi
+inoremap <C-Down> <Esc>:set showtabline=2<CR>gi 
+
+" Toggle the statusbar: {{{3
+nnoremap <A-Up> :set ls=2<CR>
+nnoremap <A-Down> :set ls=0<CR>
+inoremap <A-Up> <Esc>:set ls=2<CR>gi
+inoremap <A-Down> <Esc>:set ls=0<CR>gi
+
+" Toggle the toolbar: {{{3
+nnoremap <C-F8> :se go!=T<cr>
+
+nnoremap <C-F2> :se go!=b<cr>
+
+
+" Buffers: {{{3
+nnoremap ,bm :buffer gmail<CR>
+nnoremap ,ba :buffer about:blank<CR>
+
+" 快速调用书签
+nnoremap ,bn :bmarks<space>
+
+" Firefox's GUI: {{{3
+" 呼出侧边栏列表
+nnoremap ,gs :sidebar<space><S-tab>
+" 呼出菜单栏列表
+nnoremap ,ge :emenu<space>
+" 呼出撤销列表
+nnoremap ,gu :u<space><tab><S-tab>
+
+" ---------------------------------------------------------------------
+" Navigation: {{{2
+" nnoremap <BS> gu
+
+" Go to prev and next tab: {{{3
+nnoremap ,q gT
+nnoremap ,w gt
+
+nnoremap h <count>gT
+nnoremap l <count>gt
+
+" Move current tab: {{{3
+nnoremap Q :tabmove! -1<cr>
+nnoremap W :tabmove! +1<cr>
+
+" Scroll: {{{3
+" nnoremap j 6j
+" nnoremap k 6k
+
+" 实现快速的重启,查看下载,查看扩展: {{{3
+noremap <leader>r :restart<cr>
+noremap <leader>a :addons<cr>
+noremap <leader>d :downloads<cr>
+
+" 实现页面的编码的快速切换: {{{3
+nnoremap <leader>es :set encoding=Shift_JIS<CR>
+nnoremap <leader>ec :set encoding=EUC-JP<CR>
+nnoremap <leader>eu :set encoding=UTF-8<CR>
+nnoremap <leader>eg :set encoding=GB2312<CR>
+nnoremap ,eu :set encoding=UTF-8<CR>
+nnoremap ,eg :set encoding=GB2312<CR>
+nnoremap -js e dactyl.execute("set encoding="+(options["encoding"]=="UTF-8" ? "GB2312" : "UTF-8"))
+
+" surround com and net可以直接先输入网站名,再用<CTRL>+<ENTER>快捷输入.com/.net: {{{3
+cnoremap <S-Return> <End>.org<Home><C-Right>www.<CR>
+cnoremap <C-Return> <End>.com<Home><C-Right>www.<CR>
+
+" ---------------------------------------------------------------------
+" Buffer: {{{2
+" 复制当前打开的所有标签的URLs
+map <c-y> -d "Yank all locations to the clipboard" -e yank :tabdo :echo buffer.uri.spec
+
+" 定义一个<c-p>用于打开多个URLs {{{3
+javascript <<EOF
+/*
+ * 打开剪切板中的一组URLs，这些URLs之间必须用配置项urlseparator设置的分隔符分
+ * 隔，默认的分隔符是竖线|
+ */
+tabs.openURLs = function() {
+	let urls = dactyl.clipboardRead();
+	// let urlsArray = urls.split(options.get("urlseparator").value);
+	let urlsArray = urls.split(/\r|\|/);
+	for(var i in urlsArray) {
+		dactyl.open(urlsArray[i], { from: "paste", where: dactyl.NEW_TAB });
+	}
+};
+EOF
+
+map <c-p> -d "Open urls based on the current clipboard contents" -js tabs.openURLs();
+" 这个快捷键可以打开剪切板中的一组URLs，这些URLs之间必须用配置项urlseparator设置
+" 的分隔符分隔，默认的分隔符是竖线|所以，如果想支持打开通过<c-y>复制得到的URLs，
+" 还需要添加分隔符-回车换行符
+" 如果这样设置会导致用:tabopen/:open打开如果选中的文字是空格分隔的多个关键字，则
+" 用默认搜索引擎开多个标签分别进行搜索的文字是空格分隔的多个关键字，则用默认搜索
+" 引擎开多个标签分别进行搜索
+" set urlseparator='(\||\s+)'
+" 这样设置urlseparator就可以支持|或者任何空白字符（包括换行）作为URLs的分隔符。
+" }}}3
+
+" ---------------------------------------------------------------------
+" Search: {{{2
+" 实现在页面中快速搜索当前选定词.(Google US Search): {{{3
+nnoremap <leader>s :googleus
+nnoremap <silent> <leader>S :exe ":googleus "+content.getSelection()<CR>
+
+" 如果有文字链接被选中，则直接打开链接；如果被选中的是一般文字，则用默认搜索引擎搜索；否则打开:tabopen，手动输入关键字搜索。: {{{3
+nnoremap t -js content.getSelection().toString() != '' ? dactyl.execute(":tabopen " + content.getSelection()) : CommandExMode().open("tabopen ")
+nnoremap o -js content.getSelection().toString() != '' ? dactyl.execute(":open " + content.getSelection()) : CommandExMode().open("open ")
+
+" 调用Google快照打开网页
+nnoremap gc -js
+			\ window.content.location.href=window.content.location.href.replace(/^https?:\/\//i, 
+			\ 'https://webcache.googleusercontent.com/search?&q=cache:' + encodeURIComponent(location.href.replace('http://','')));
+
+" 选择搜索引擎
+nnoremap S :SearchSelect<Space>
+
+" 在某个搜索引擎结果页面按s键，会弹出引擎列表，选中引擎直接更换引擎用当前搜索的内容重新搜索。
+nnoremap s gi<ESC> :switchenginesearch<Space>
+
+" Look up the word you selected in dict.cn在dict.cn中查找所选词的英语
+" nnoremap <leader>w :dict
+" nnoremap <silent> <leader>W :exe ":dict "+content.getSelection()<CR>
+
+" ---------------------------------------------------------------------
+" Add mapping such that vimperator or pentadactyl behaves a lot like MS-Windows: {{{2
+" vimperator 不支持-m形式
+map -m n,v,i,c,t <C-a> <Pass>
+map -m n,v,i,c,t <C-c> <Pass>
+map -m i,c,t <C-v> <Pass>
+map -m i,c,t <C-x> <Pass>
+map -m i,c,t <C-z> <Pass>
+
+" ctrl+v黏贴
+" inoremap <C-v> <C-v><C-v>
+" cnoremap <C-v> <C-v><C-v>
+
+" ctrl+x剪切
+" inoremap <C-x> <C-v><C-x>
+" cnoremap <C-x> <C-v><C-x>
+
+" ctrl+z撤销jj
+" inoremap <C-z> <C-v><C-z>
+" cnoremap <C-z> <C-v><C-z>
+
+" ctrl+a全选
+" noremap <C-a> <C-v><C-a>
+" inoremap <C-a> <C-v><C-a>
+" cnoremap <C-a> <C-v><C-a>
+
+" ---------------------------------------------------------------------
+" map to js functions: {{{2
+" flybar_1.3.5.4.uc.xul
+" PopupUrlBar.showAddressBar(); 呼出地址栏
+" PopupUrlBar.showSearchBar(); 呼出搜索框
+" PopupUrlBar.showAndFocusSearchBar(); 呼出搜索框并选中搜索关键字
+" PopupUrlBar.showAndFocusAddressBar(); 呼出地址栏并选中当前地址
+nnoremap ,ja -js PopupUrlBar.showAddressBar();
+nnoremap ,js -js PopupUrlBar.showSearchBar();
+nnoremap ,jfa -js PopupUrlBar.showAndFocusAddressBar();
+nnoremap ,jfs -js PopupUrlBar.showAndFocusSearchBar();
+
+" ---------------------------------------------------------------------
+" map for .vimperatorrc/pentadactyl: {{{2
+nnoremap ,sp :so ~/.pentadactylrc<CR>
+nnoremap ,sv :so ~/.vimperatorrc<CR>
+nnoremap ,ep :eprc<CR>
+nnoremap ,ev :evrc<CR>
+
+" ---------------------------------------------------------------------
+" 各种脚本的快速命令: {{{2
+" 快速复制
+nnoremap cd :copy titleAndURL<CR>
+nnoremap ca :copy anchor<CR>
+nnoremap cs :copy selanchor<CR>
+nnoremap cb :copy htmlblockquote<CR>
+
+" ---------------------------------------------------------------------
+" e$ 删除当前及其右侧所有标签
+" e^ 删除当前及其左侧所有标签
+" 3e8 从 3 到 8 被删除
+nmap -count -arg -javascript e removeTabs(count, arg)
+
+" 把向下滚屏和下一页的功能合并到一块儿，并修正了向不可见元素”下一页“发送事件的bug。
+nmap <space> -js PageDownThenNextPage();
+
+" =================================================
+" Plugins settings: {{{1
+" =================================================
+" center_select.js
+nnoremap <silent> zz :centerselect<CR>
+" nnoremap <silent> zz :centerselect "border: 5px solid orange;"<CR>
+nnoremap <silent> n n:norm zz<CR>
+nnoremap <silent> N N:norm zz<CR>
+nnoremap zH 10h
+nnoremap zL 10l
+
+" dict.js
+" 当不带查询内容时,会使用选区中的内容
+map -a -ex s dict -e <arg>
+" 开启或者关闭声音
+" set nodict-hasaudio
+
+" edit.js
+" 设置外部编辑器， 这两种路径名写法都可以，不要写成'C:/Program
+" Files/Vim/vim73/gvim.exe', 这种写法 pentadactyl 认，但 firefox 不认。oped 选
+" 项默认为空，使用系统关联的编辑器。
+" set oped=D:\\Program\ Files\\Vim\\vim73\\gvim.exe
+" set oped='D:\Program Files\Vim\vim73\gvim.exe'      
+" set oped=gvim
+" 外部编辑器支持的文件名扩展
+" set opsu+=.c,.cpp,.h
+
+" _smoozee.js
+nnoremap j :js dactyl.plugins.smooziee.smoothScrollBy(400)<CR>
+nnoremap k :js dactyl.plugins.smooziee.smoothScrollBy(-400)<CR>
+
+" simple-translate.js
+" set langpair="en|zh"
+
+" chinese-hints.js
+" pinyin
+set hintmatching=custom
+" wubi
+" set hintmatching=custom chinesehints=wubi
+
+" Javascript: {{{1
+" =================================================
+" Get .vimperatorrc/.pentadactylrc path: {{{2
+javascript <<EOF
+function getRcPath () {
+	var env = Components.classes["@mozilla.org/process/environment;1"].
+			  getService(Components.interfaces.nsIEnvironment);
+	if (env.exists("HOME")) {
+		return env.get("HOME");
+	}
+	var ProfD = Components.classes["@mozilla.org/file/directory_service;1"].
+				getService(Components.interfaces.nsIProperties).
+				get("ProfD", Components.interfaces.nsIFile);
+	return ProfD.path.indexOf("Portable") != -1
+				? ProfD.parent.path + ((ProfD.path.search(/\\/) != -1) ? "\\" : "/") + "settings"
+				: ProfD.path;
+}
+EOF
+
+" ---------------------------------------------------------------------
+" Get full path of firefox executable: {{{2
+javascript <<EOF
+function getFirefoxDirectory () {
+	var appDir = Components.classes["@mozilla.org/file/directory_service;1"].
+				 getService(Components.interfaces.nsIProperties).
+				 get("CurProcD", Components.interfaces.nsILocalFile);
+	return appDir.path;
+}
+EOF
+
+" ---------------------------------------------------------------------
+" Get full path to firefox executable: {{{2
+javascript <<EOF
+function getFirefoxExecutable () {
+	var appDir = Components.classes["@mozilla.org/file/directory_service;1"].
+				 getService(Components.interfaces.nsIProperties).
+				 get("CurProcD", Components.interfaces.nsILocalFile);
+	appDir.append("firefox.exe");
+	return appDir.path;
+}
+EOF
+
+" ---------------------------------------------------------------------
+" getFirefoxShortcut: {{{2
+javascript <<EOF
+function getFirefoxShortcut (shortcut) {
+	try{
+		var appDir = Components.classes["@mozilla.org/file/directory_service;1"].
+					 getService(Components.interfaces.nsIProperties).
+					 get(shortcut, Components.interfaces.nsILocalFile);
+		//appDir.append(shortcut);
+		return appDir.path;
+	}catch(e){
+		return "Can't get shortcut";
+	}
+}
+EOF
+
+" ---------------------------------------------------------------------
+" echoFirefoxShortcut: {{{2
+javascript <<EOF
+function echoFirefoxShortcut () {
+	var shortcut = new Array("AppRegF", "AppRegD", "DefRt", "PrfDef", "profDef", "ProfDefNoLoc", 
+		"DefProfRt", "DefProfLRt", "ARes", "AChrom", "APlugns"   , "SrchPlugns", "AChromDL", 
+		"APluginsDL", "SrchPluginsDL", "SHARED", "PrefD", "PrefF", "PrefDL", "ExtPrefDL", 
+		"PrefDOverride", "ProfD", "ProfLD", "UChrm", "UsrSrchPlugns", "LclSt", "UHist", "UPnls", 
+		"UMimTyp", "cachePDir", "BMarks", "DLoads", "SrchF", "XPIClnupD", "UStor","Home", "TmpD", 
+		"CurWorkD", "Desk", "CurProcD", "XCurProcD", "ComsD", "ComsDL", "ComRegF", "XptiRegF", 
+		"XpcomLib", "GreD", "GreComsD", "SysD", "Trsh", "Strt", "Shdwn", "ApplMenu", "CntlPnl", 
+		"Exts", "Fnts", "Prfs", "Docs", "ISrch", "DfltDwnld", "ULibDir", "UsrDsk", "LocDsk", "UsrApp", 
+		"LocApp", "UsrDocs", "LocDocs", "UsrIntrntPlgn", "LoclIntrntPlgn", "UsrFrmwrks", "LocFrmwrks", 
+		"UsrPrfs", "LocPrfs", "Pct", "Mov", "Music", "IntrntSts", "WinD", "ProgF", "DeskV", "Progs", 
+		"Cntls", "Prnts", "Pers", "Favs", "Strt", "Rcnt", "SndTo", "Buckt", "Strt", "DeskP", "Drivs", 
+		"NetW", "netH", "Fnts", "Tmpls", "CmStrt", "CmPrgs", "CmStrt", "CmDeskP", "AppData", "LocalAppData", 
+		"PrntHd", "CookD", "DfltDwnld", "Locl", "LibD", "XDGDesk", "XDGDocs", "XDGDwnld", "XDGMusic", 
+		"XDGPict", "XDGPubSh", "XDGTempl", "XDGVids", "DfltDwnld", "OS2Dir", "DrvD");
+	shortcut.sort();
+	for(var i=0; i<shortcut.length; i++){
+		dactyl.echo(shortcut[i] + " : " + getFirefoxShortcut(shortcut[i]));
+	}
+}
+EOF
+
+" ---------------------------------------------------------------------
+" getEnvironmentVariable: {{{2
+javascript <<EOF
+function getEnvironmentVariable (aName) {
+	var env = Components.classes["@mozilla.org/process/environment;1"].
+			  getService(Components.interfaces.nsIEnvironment);
+	if (env.exists(aName)) {
+		return env.get(aName);
+	}
+	else {
+		return "Not find the environment variable of " + aName;
+	}
+}
+EOF
+
+" ---------------------------------------------------------------------
+" setEnvironmentVariable: {{{2
+javascript <<EOF
+function setEnvironmentVariable (aName, aValue) {
+	var env = Components.classes["@mozilla.org/process/environment;1"].
+			  getService(Components.interfaces.nsIEnvironment);
+	env.set(aName, aValue);
+}
+EOF
+
+" ---------------------------------------------------------------------
+" removeTabs: {{{2
+javascript <<EOF
+function removeTabs (count, arg) {
+		let end_pattern = /^[0-9]+$|^(\^|\$)$/;
+		if (!end_pattern.test(arg)) {
+				dactyl.echo("Invalid Range", commandline.FORCE_SINGLELINE)
+				return false;
+		}
+	   
+		let end = 0;
+		if (arg == "$")
+				end = tabs.visibleTabs.length;
+		else if (arg == "^")
+				end = -tabs.visibleTabs.length;
+		else
+				end = parseInt(arg);
+
+		let start = 0;
+		if (typeof count === "object")
+				if (end < start)
+						start = tabs.index(null, true) + 1;
+				else
+						start = tabs.index(null, true);
+		else {
+				start = parseInt(count);
+				if (start != 0)
+						start = parseInt(count) - 1;
+		}
+
+		let visibleTabs = tabs.visibleTabs;
+		let removedTabs = [];
+		if (start < end )
+				removedTabs = Array.slice(visibleTabs).slice(start, end);
+		else
+				removedTabs = Array.slice(visibleTabs).slice(end, start);
+		let removedTabs_length = removedTabs.length;
+		removedTabs.forEach(function (aTab) {
+				gBrowser.removeTab(aTab);
+		});
+		dactyl.echo(removedTabs_length + " tab(s) has been removed!");
+}
+EOF
+
+" ---------------------------------------------------------------------
+" Add search bookmark: {{{2
+javascript <<EOF
+//Add a bookmark
+function bmark(title, url, keyword, tags) {
+	if (!bookmarks.isBookmarked(url)) {
+		//bookmarks.add(false, title, url, keyword, ['keyword'], false);
+		bookmarks.add(false, title, url, keyword, [tags], false);
+	}
+}
+function addSearchToBookmark () {
+	bmark('Google US Search', 'http://www.google.com/search?hl=zh-CN&ie=UTF-8&q=%s', 'g', 'Google, US, Search');
+	bmark('Google Encrypted Search', 'https://encrypted.google.com/search?hl=zh-CN&ie=UTF-8&q=%s', 'ge', 'Google, Encrypted, Search');
+	bmark('Google SSL Search', 'https://www.google.com/search?hl=zh-CN&ie=UTF-8&q=%s', 'gs', 'Google, SSL, Search');
+	bmark('GGSSL Search', 'https://www.ggssl.com/search?sourceid=Firefox&hl=zh-CN&ie=UTF-8&q=%s', 'gg', 'GGSSL, Search');
+	bmark('Yahoo! Search', 'http://search.yahoo.com/search;_ylt=?p=%s', 'y', 'Yahoo!, Search');
+	bmark('Baidu Search', 'http://www.baidu.com/s?wd=%s', 'b', 'Baidu, Search');
+	bmark('Twitter', 'http://twitter.com/%s', 'tw', 'Twitter');
+	bmark('Twitter Search', 'http://search.twitter.com/search?q=%s', 'ts', 'Twitter, Search');
+}
+EOF
+
+" ---------------------------------------------------------------------
+" Get/Show the profile directory: {{{2
+javascript <<EOF
+function openProfileDirectory () {
+	// Get the profile directory.
+	var file = Components.classes["@mozilla.org/file/directory_service;1"].  
+		getService(Components.interfaces.nsIProperties).  
+		get("ProfD", Components.interfaces.nsIFile);
+	let profileDir = file.path;
+
+	// Show the profile directory.
+	let nsLocalFile = Components.Constructor("@mozilla.org/file/local;1","nsILocalFile", "initWithPath");
+	new nsLocalFile(profileDir).reveal();
+}
+EOF
+
+" ---------------------------------------------------------------------
+" Get a list of files from a chrome URL.: {{{2
+" https://gist.github.com/774684
+javascript <<EOF
+/*
+* This code is in the public domain.
+*
+* ChromeFiles.get("chrome://browser/content/")
+* => [ "chrome://browser/content/NetworkPanel.xhtml",
+* "chrome://browser/content/aboutDialog.css",
+* ...,
+* "chrome://browser/content/browser.css",
+* "chrome://browser/content/browser.js",
+* "chrome://browser/content/browser.xul",
+* ... ]
+*/
+
+var ChromeFiles = {
+	get: function CF_get(spec) {
+		const ios = Cc['@mozilla.org/network/io-service;1'].
+					getService(Ci.nsIIOService);
+		let uri = ios.newURI(spec, null, null);
+		return this.getByURI(uri);
+	},
+
+	getByURI: function CF_getByURI(uri) {
+		let baseURI = uri.clone().QueryInterface(Ci.nsIURL);
+		baseURI.path = baseURI.directory;
+		const registry = Cc['@mozilla.org/chrome/chrome-registry;1'].
+						 getService(Ci.nsIChromeRegistry);
+		let localURI = registry.convertChromeURL(baseURI);
+
+		let leafNames = null;
+		if (localURI instanceof Ci.nsIFileURL) {
+			leafNames = this.getLeafNamesByDirectory(localURI.file);
+		} else if (localURI instanceof Ci.nsIJARURI) {
+			leafNames = this.getLeafNamesByJARURI(localURI);
+		} else {
+			throw new Error('Unknown URI: ' + localURI.spec);
+		}
+
+		let baseSpec = baseURI.spec;
+		return leafNames.sort().map(function (leafName) baseSpec + leafName);
+	},
+
+	getLeafNamesByDirectory: function CF_getLeafNamesByDirectory(dir) {
+		let files = dir.directoryEntries;
+		let leafNames = [];
+		while (files.hasMoreElements()) {
+			let file = files.getNext().QueryInterface(Ci.nsIFile);
+			if (file.isFile())
+				leafNames.push(file.leafName);
+		}
+		return leafNames;
+	},
+
+	getLeafNamesByJARURI: function CF_getLeafNamesByJARURI(jarURI) {
+		let zip = this.openZipReader(jarURI.JARFile);
+		try {
+			let baseEntry = jarURI.JAREntry;
+			let pattern = baseEntry + '?*~' + baseEntry + '?*/*';
+			let entries = zip.findEntries(pattern);
+			let leafNames = [];
+			while (entries.hasMore())
+				leafNames.push(entries.getNext().substring(baseEntry.length));
+			return leafNames;
+		} finally {
+			zip.close();
+		}
+	},
+
+	openZipReader: function CF_openZipReader(uri) {
+		let zip = Cc['@mozilla.org/libjar/zip-reader;1'].
+				  createInstance(Ci.nsIZipReader);
+		if (uri instanceof Ci.nsIFileURL) {
+			zip.open(uri.file);
+		} else if (uri instanceof Ci.nsIJARURI) {
+			let innerZip = this.openZipReader(uri.JARFile);
+			zip.openInner(innerZip, uri.JAREntry);
+		} else {
+			throw new Error('Unknown URI: ' + uri.spec);
+		}
+		return zip;
+	},
+};
+EOF
+
+" ---------------------------------------------------------------------
+" Open Folder: {{{2
+javascript <<EOF
+/*
+在firefox中打开指定文件夹
+
+定义ex命令 – folder
+	:com! folder -description "Open this folder" -nargs=? -complete dir -js io.openFolder(args);
+
+用法说明:
+
+	1. 不指定目录无参数调用时，打开当前目录
+		通过:pwd查看当前目录
+		通过:cd更改当前目录
+	2. 使用绝对路径指定文件夹
+		比如
+			:folder e:\\algorithm
+		跟第一种简单办法一样。
+	3. 使用相对路径指定文件夹
+		默认情况下，相对路径只从当前目录开始搜索
+		比如：当前在firefox的profiles目录下
+			:folder chrome
+		即可打开profiles目录下的chrome文件夹
+		如果设置了环境变量$CDPATH，$CDPATH定义的目录都作为相对路径的搜索起点。
+		设置配置项cdpath
+			:help cdpath
+		配置项cdpath下的所有路径都作为相对路径的搜索起点。 
+	4. 支持文件夹autocompletion
+*/
+io.openFolder = function(arg) {
+	try{
+	if(arg) {
+		try {
+			arg = arg.toString();
+		}catch(e) {
+			arg = null;
+		}
+	}
+
+	var folderPath = arg;
+	if (!folderPath) {
+		folderPath = io.cwd.path;
+	}
+
+	folderPath = File.expandPath(folderPath);
+	if(!File.isAbsolutePath(folderPath)) {
+		let dirs = modules.options.get("cdpath").files;
+		for (let dir in values(dirs)) {
+			dir = dir.child(folderPath);
+			if (dir.exists() && dir.isDirectory() && dir.isReadable()) {
+				folderPath = dir.path;
+				break;
+			}
+		}
+	}
+	gBrowser.selectedTab = gBrowser.addTab(folderPath);
+	}catch(e) { dactyl.echerr(e); }
+};
+EOF
+
+" ---------------------------------------------------------------------
+" Toggle Proxy Type: {{{2
+javascript <<EOF
+function toggle_proxy() {
+	if (prefs.get("network.proxy.type") != 0)
+		prefs.set("network.proxy.type", 0);
+	else
+		prefs.set("network.proxy.type", 2);
+}
+EOF
+
+" ---------------------------------------------------------------------
+" Proxy: {{{2
+javascript <<EOF
+function getProxy () {
+	/* based upon chrome://global/content/config.js - dickvl@kb.mozillazine.org */
+	/* http://kb.mozillazine.org/User:Dickvl/JavaScript_Error_Console#Preferences_Printing */
+
+	const Cc=Components.classes, Ci=Components.interfaces;
+
+	const nsIPrefLocalizedString = Ci.nsIPrefLocalizedString;
+	const nsISupportsString = Ci.nsISupportsString;
+	const nsIPrefBranch = Ci.nsIPrefBranch;
+	const nsIPrefService = Ci.nsIPrefService;
+	const nsPrefService_CONTRACTID = "@mozilla.org/preferences-service;1";
+	const gPrefService = Cc[nsPrefService_CONTRACTID].getService(nsIPrefService);
+	const gPrefBranch = gPrefService.getBranch(null).QueryInterface(Ci.nsIPrefBranch2);
+
+	return gPrefService.getBranch("network.proxy.");
+}
+EOF
+
+" ---------------------------------------------------------------------
+" load_script: {{{2
+" http://kkito.cn/index.php/blog/getArticle/325/动态_跨域加载调用js
+javascript <<EOF
+function load_script(sURL , oCallBack) {
+	var document = content.document;
+	var js = document.createElement("script");
+	var IE = /msie/i.test(navigator.userAgent);
+	if (IE) {
+		js.onreadystatechange = function() {
+			if (js.readyState.toLowerCase() == "complete" || js.readyState.toLowerCase() == "loaded"){
+				if(oCallBack) oCallBack.call(oCallBack);
+			}
+		}
+	} else {
+		js.onload = function() {
+			if (oCallBack) oCallBack.call(oCallBack)
+		}
+	}
+	js.src = sURL;
+	document.getElementsByTagName("head")[0].appendChild(js)
+}
+EOF
+
+" ---------------------------------------------------------------------
+" PageDown Then NextPage: {{{2
+" 把向下滚屏和下一页的功能合并到一块儿，并修正了向不可见元素”下一页“发送事件的
+" bug。这样一来网速够快的情况下，基本上可以不用扩展AutoPager了把向下滚屏和下一页
+" 的功能合并到一块儿，并修正了向不可见元素”下一页“发送事件的bug。这样一来网速够
+" 快的情况下，基本上可以不用扩展AutoPager了
+javascript <<EOF
+function PageDownThenNextPage(){
+	let win = document.commandDispatcher.focusedWindow;
+	if (!win) return;
+	win.scrollY; // intentional - see Kris
+	let percent = win.scrollY    == 0 ?  0 : // This prevents a forced rendering
+		win.scrollMaxY == 0 ? -1 : win.scrollY / win.scrollMaxY;
+
+	if(percent>=0 && percent<1) {
+		buffer.scrollVertical("pages", 1);
+		return;
+	}
+
+	var c = 0;
+	var elem;
+	while(true){
+		elem = buffer.findLink("next", options["nextpattern"], c, false);
+		if(elem==undefined) {
+			dactyl.beep();
+			return;
+		}
+		var rect = elem.getBoundingClientRect();
+		if(rect.height>0 || rect.width>0) {
+			buffer.followLink(elem, dactyl.CURRENT_TAB);
+			return;
+		}
+		c++;
+	}
+}
+EOF
+
+" =================================================
+" AutoCmds: {{{1
+" =================================================
+autocmd! LocationChange .* js modes.passAllKeys=false
+autocmd! LocationChange www\.google\.(com\.hk|com)/reader js modes.passAllKeys = true
+autocmd! LocationChange mail\.google\.com js modes.passAllKeys = true
+autocmd! LocationChange (web|web2)\.qq\.com js modes.passAllKeys = true
+" autocmd LocationChange .* js util.copyToClipboard(buffer.URL)
+
+" Greader重定向
+autocmd LocationChange '^http://www.google.com/reader/view/feed/' -js window.content.location.href=window.content.location.href.replace(/^http/i, "https");
+
+" =================================================
+" Commands: {{{1
+" =================================================
+command! -nargs=+ lazy autocmd Enter .* <args>
+
+" ---------------------------------------------------------------------
+" .vimperatorrc/.pentadactylrc: {{{2
+" 查看.pentadactylrc文件内容
+command! prc -description "Open .pentadactylrc file" -js
+			\ gBrowser.selectedTab = gBrowser.addTab("file:///"
+			\ + getRcPath() + "/.pentadactylrc");
+
+" 查看.vimperatorrc文件内容
+command! vrc -description "Open .vimperatorrc file" -js
+			\ gBrowser.selectedTab = gBrowser.addTab("file:///"
+			\ + getRcPath() + "/.vimperatorrc");
+
+" 编辑.pentadactylrc文件
+command! eprc -description "Edit .pentadactylrc file" -js
+			\ editor.editFileExternally(getRcPath() + "\\.pentadactylrc");
+
+" 编辑.vimperatorrc文件
+command! evrc -description "Edit .vimperatorrc file" -js
+			\ editor.editFileExternally(getRcPath() + "\\.vimperatorrc");
+
+" 重新载入rc文件
+command! refreshp -description "Reload .pentadactyl rc file" execute "source $HOME/.pentadactylrc"
+command! refreshv -description "Reload .vimperatorrc rc file" execute "source $HOME/.vimperatorrc"
+
+" ---------------------------------------------------------------------
+" Buffers: {{{2
+command! -complete=history -nargs=+ -description="Open history in the current tab" hopen open <args>
+command! -complete=history -nargs=+ -description="Open history in a new tab" htabopen tabopen <args>
+
+" 打开指定文件夹
+" 这个命令只支持绝对路径。
+command! folder -description "Open this folder" -nargs=1 -complete dir -js gBrowser.selectedTab = gBrowser.addTab(args);
+
+" ---------------------------------------------------------------------
+" 调用内部Javascript: {{{2
+" getFirefoxShortcut(shortcut): {{{3
+command! getFirefoxShortcut -description "Get the firefox shortcut" -nargs=1 -complete custom,'[
+		\ ["ProfD", "profile directory"],
+		\ ["DefProfRt", "user (for example /root/.mozilla)"],
+		\ ["UChrm", "%profile%/chrome"],
+		\ ["DefRt", "%installation%/defaults"],
+		\ ["PrfDef", "%installation%/defaults/pref"],
+		\ ["ProfDefNoLoc", "%installation%/defaults/profile"],
+		\ ["APlugns", "%installation%/plugins"],
+		\ ["AChrom", "%installation%/chrome"],
+		\ ["ComsD", "%installation%/components"],
+		\ ["CurProcD", "installation (usually)"],
+		\ ["Home", "OS root (for example /root)"],
+		\ ["TmpD", "OS tmp (for example /tmp)"],
+		\ ["ProfLD", "Local Settings on windows; where the network cache and fastload files are stored"],
+		\ ["resource:app", "application directory in a XULRunner app"],
+		\ ["Desk", "Desktop directory (for example ~/Desktop on Linux, C:\\Documents and Settings\\username\\Desktop on Windows)"],
+		\ ["Progs", "User start menu programs directory (for example C:\\Documents and Settings\\username\\Start Menu\\Programs)"]]'
+	\ -js dactyl.echo(getFirefoxShortcut(args));
+" }}}
+
+" getFirefoxDirectory()
+command! getFirefoxDirectory -description "Get the firefox directory" -nargs=0 -js dactyl.echo(getFirefoxDirectory());
+
+" getFirefoxExecutable()
+command! getFirefoxExecutable -description "Get the firefox executable" -nargs=0 -js dactyl.echo(getFirefoxExecutable());
+
+" getEnvironmentVariable()
+command! getEnvironmentVariable -description "Get the value of an environment variable" -nargs=1 -complete=environment
+			\ -js dactyl.echo(getEnvironmentVariable(args));
+
+" setEnvironmentVariable()
+command! setEnvironmentVariable -description "Set the value of an environment variable" -nargs=+ -complete=environment
+			\ -js setEnvironmentVariable(args);
+
+" echoFirefoxShortcut()
+command! echoFirefoxShortcut -description "Getting special files" -nargs=0 -js dactyl.echo(echoFirefoxShortcut());
+
+" io.openFolder(arg)
+" 不指定目录无参数调用时，打开当前目录；使用绝对路径指定文件夹；使用相对路径指
+" 定文件夹，默认情况下，相对路径只从当前目录开始搜索，如果设置了环境变量$CDPATH，
+" $CDPATH定义的目录都作为相对路径的搜索起点；支持文件夹autocompletion。
+command! openFolder -description "Open this folder" -nargs=? -complete dir -js io.openFolder(args);
+
+" openProfileDirectory()
+" Get/Show the profile directory
+command! openProfileDirectory -description "Open the profile directory" -nargs=0 -js openProfileDirectory();
+
+" ChromeFiles.get(spec)
+" Get a list of files from a chrome URL.
+command! getChromeFiles -description "Get a list of files from a chrome URL" -nargs=1 -complete custom,'
+			\ [["chrome://browser/content/", "chrome://browser/content/*"]]'
+			\ -js dactyl.echo(ChromeFiles.get(args));
+
+" ---------------------------------------------------------------------
+" 调用外部Javascript: {{{2
+" flybar.uc.xul - Popup urlbar and searchbar in the center of the screen
+command! showAddressBar -description "Show address bar" -js PopupUrlBar.showAddressBar();
+command! showSearchBar -description "Show search bar" -js PopupUrlBar.showSearchBar();
+command! showAndFocusAddressBar -description "Show and focus address bar" -js PopupUrlBar.showAndFocusAddressBar();
+command! showAndFocusSearchBar -description "Show and focus search bar" -js PopupUrlBar.showAndFocusSearchBar();
+
+" tabLock_mod1.uc.js
+command! lockTab -description "Lock Tab" -js gBrowser.lockTab(gBrowser.selectedTab);
+
+" tabProtect_mod1.uc.js
+command! protectTab -description "Protect Tab" -js Browser.protectTab(gBrowser.selectedTab);
+
+" Jash: JavaScript Shell
+" http://www.billyreisinger.com/jash/source/latest/Jash_source.js
+command! jash -description " A Cross-Browser Javascript Command-Line Debugging Tool" -nargs=0
+			\ -js (function(){buffer.doc.body.appendChild(buffer.doc.createElement('script')).src='http://www.billyreisinger.com/jash/source/latest/Jash.js';})();
+
+" QQ云词典
+" http://cidian.qq.com/cloud/
+command! QQCloudDict -description "启动QQ云词典" -nargs=0
+			\ -js void((function(d){if(!!d){d.toggle();return;};var src='http://dict.qq.com/cloudgetjs';var document=buffer.doc;var e=document.createElement('script');e.setAttribute('src',src);document.getElementsByTagName('head')[0].appendChild(e);})(window.QQCloudDict))
+
+" 必应云词典
+" http://dict.bing.com.cn/cloudwidget/Default.aspx
+command! BingTranslate -description "必应云词典" -nargs=0
+			\ -js (function(document){var head=document.getElementsByTagName('head')[0]; var script=document.createElement('script'); script.type='text/javascript'; script.onload=function(){dactyl.execute(":open " + "javascript:BingCW.Init({MachineTranslation:true,WebDefinition:true});")}; script.src='http://dict.bing.com.cn/cloudwidget/Scripts/Generated/BingTranslate_Hover_Phrase_Selection_ShowIcon.js'; head.appendChild(script);})(content.document);
+" Bing Translate Bookmarklet
+" http://kaix.in/daddy/2011/06/bing-translate-bookmarklet/
+command! Engkoo -description "开启 Engkoo 翻译" -nargs=0
+			\ -javascript load_script('http://dict.bing.com.cn/cloudwidget/Scripts/Generated/BingTranslate_Selection_ShowIcon.js', function(){dactyl.execute(":open " + "javascript:BingCW.Init({MachineTranslation:true,WebDefinition:true})")})
+
+
+" ---------------------------------------------------------------------
+" 调用其它浏览器打开当前页面: {{{2
+command! ie -js io.run("C:\\Program\ Files\\Internet\ Explorer\\iexplore.exe", [buffer.URL]) 
+
+" ---------------------------------------------------------------------
+" about:config里删除多个首选项: {{{2
+command! configResetSelected -description "可以用Ctrl和Shift多选about:config的首选项" -nargs=0
+			\ -js void((function(){document.getElementById("configTree").setAttribute("seltype","multiple");ResetSelected=function(){for(var t=0,start=new Object(),end=new Object();t<view.selection.getRangeCount();t++){view.selection.getRangeAt(t,start,end);for(var v=start.value;v<=end.value;v++){gPrefBranch.clearUserPref(gPrefView[v].prefCol)}}}})())
+
+" ---------------------------------------------------------------------
+" App: {{{2
+command! vimp !start %ProgramDirectory%\vim\vim73\gvim.exe ~\.vimperatorrc
+command! vim !start %ProgramDirectory%\vim\vim73\gvim.exe
+
+" ---------------------------------------------------------------------
+" Proxy: {{{2
+command! -nargs=0 toggleproxy javascript toggle_proxy(<q-args>)
+command! reloadPAC -description "Reload the proxy auto-configuration [PAC] file" -nargs=0
+			\ -js Components.classes['@mozilla.org/network/protocol-proxy-service;1'].getService().reloadPAC();
+command! setPAC -description "Set the proxy auto-configuration [PAC] file" -nargs=1 -complete custom,'
+			\ function (context) {
+			\	var file = Components.classes["@mozilla.org/file/directory_service;1"].
+			\		getService(Components.interfaces.nsIProperties).
+			\		get("ProfD", Components.interfaces.nsIFile);
+			\	file.append("Proxy");
+			\	context.completions = [
+			\	[prefs.get("network.proxy.autoconfig_url"), "Default"],
+			\	[encodeURI("file:///" + getEnvironmentVariable("MOZ_PAC_PATH").replace(/\\/g, "/") + "/Proxy.pac"), ""],
+			\	[encodeURI("file:///" + getEnvironmentVariable("MOZ_PAC_PATH").replace(/\\/g, "/") + "/AutoProxy.pac"), ""],
+			\	[encodeURI("file:///" + file.path.replace(/\\/g, "/") + "/AutoProxy.pac"), ""]]
+			\ }'
+			\ -js prefs.set('network.proxy.autoconfig_url', args[0]); prefs.set('network.proxy.type', 2);
+command! setPAC2 -description "Set the proxy auto-configuration [PAC] file" -nargs=1
+			\ -complete custom,'[
+			\	[prefs.get("network.proxy.autoconfig_url"), "Default"],
+			\	[encodeURI("file:///" + getEnvironmentVariable("MOZ_PAC_PATH").replace(/\\/g, "/") + "/Proxy.pac"), ""],
+			\	[encodeURI("file:///" + getEnvironmentVariable("MOZ_PAC_PATH").replace(/\\/g, "/") + "/AutoProxy.pac"), ""],
+			\	[encodeURI("file:///" + getFirefoxShortcut("ProfD").replace(/\\/g, "/") + "/AutoProxy.pac"), ""]]'
+			\ -js prefs.set('network.proxy.autoconfig_url', args[0]); prefs.set('network.proxy.type', 2);
+command! setProxyHTTPPort -description "Set the manual proxy configuration for http/https proxy" -nargs=1
+			\ -complete custom,'[
+			\	[prefs.get("network.proxy.http_port"), "Default"],
+			\	[8000, "GAppProxy"],
+			\	[8087, "GoAgent"],
+			\	[8001, "GPass"],
+			\	[8118, "Polipo/Privoxy"],
+			\	[8888, "Telex"],
+			\	[8086, "WallProxy"],
+			\	[4001, "JAP"],
+			\	[3998, "PaperBus"],
+			\	[1984, "Puff"],
+			\	[8080, "Toonel"],
+			\	[9666, "Wu Jie"],
+			\	[8580, "Free Gate"]]'
+			\ -js prefs.set('network.proxy.http_port', parseInt(args[0])); prefs.set('network.proxy.http', "127.0.0.1"); prefs.set('network.proxy.type', 1); prefs.set('network.proxy.share_proxy_settings', true);
+command! setProxySocksPort -description "Set the manual proxy configuration for socks proxy" -nargs=1
+			\ -complete custom,'[
+			\	[prefs.get("network.proxy.socks_port"), "Default"],
+			\	[8080, "Plink"],
+			\	[7070, "ssh -D"],
+			\	[1080, "Tunnelier"],
+			\	[9050, "Tor"]]'
+			\ -js prefs.set('network.proxy.socks_port', parseInt(args[0])); prefs.set('network.proxy.http', ""); prefs.set('network.proxy.socks', "127.0.0.1"); prefs.set('network.proxy.type', 1); prefs.set('network.proxy.share_proxy_settings', false); prefs.set('network.proxy.share_proxy_settings', false);
+command foo -nargs=? -complete custom,'
+    \ function (context) context.completions = [["val1", "description1"], ["val2", "description2"]]'
+    \ :echo Useless  + <q-args>
+
+" ---------------------------------------------------------------------
+" Search: {{{2
+" Google (No Instant)
+command! google-noinstant -description "google search without instant enabled" -nargs=*
+			\ tabopen http://www.google.com/search?hl=zh-CN&complete=0&ie=UTF-8&oe=utf-8&q=%s<args>
+" Google Encrypted Search
+command! googleencrypted -description "Google Encrypted Search" -nargs=* tabopen https://encrypted.google.com/search?hl=zh-CN&ie=UTF-8&q=<args>
+" Google Encrypted (No Instant)
+command! googleencrypted-noinstant -description "Google Encrypted (No Instant)" -nargs=*
+			\ tabopen https://encrypted.google.com/search?hl=zh-CN&complete=0&ie=UTF-8&oe=utf-8&q=&q=<args>
+" Google SSL Search
+command! googlessl -description "Google SSL Search" -nargs=* tabopen https://www.google.com/search?hl=zh-CN&ie=UTF-8&q=<args>
+" Google SSL (No Instant)
+command! googlessl-noinstant -description "google ssl search without instant enabled" -nargs=*
+			\ tabopen https://www.google.com/search?hl=zh-CN&complete=0&ie=UTF-8&oe=utf-8&q=%s<args>
+" Google US Search
+command! googleus -description "Google US Search" -nargs=* tabopen http://www.google.com/search?hl=zh-CN&ie=UTF-8&q=<args>
+" Google US SSL (No Instant)
+command! googleus-noinstant -description "google search without instant enabled" -nargs=*
+			\ tabopen http://www.google.com/search?complete=0&ie=UTF-8&oe=utf-8&q=%s<args>
+" GGSSL Search
+command! ggssl -description "GGSSL Search" -nargs=* tabopen https://www.ggssl.com/search?sourceid=Firefox&hl=zh-CN&ie=UTF-8&q=<args>
+" Yahoo! Search
+command! yahoo -description "Yahoo! Search" -nargs=* tabopen http://search.yahoo.com/search;_ylt=?p=<args>
+" Baidu Search
+command! baidu -description "Baidu Search" -nargs=* tabopen http://www.baidu.com/s?wd=<args>
+" Look up the word in dict.cn
+" command! dict -nargs=* tabopen http://dict.cn/<args>
+
+" 输入搜索引擎关键字（当然也可以在自动补全菜单里选择），这时啥也不选直接按回车就是用默认的Google搜索（如果选中的恰好是链接的话则是直接打开链接）。
+command! -nargs=? -complete=search SearchSelect exe 't <args> ' + content.getSelection()
+command! -nargs=? -complete=search engineSelect exe 't <args> ' + content.getSelection()
+
+" 当我用google搜索了一个内容后，可能还想再用baidu搜索一下，这时候我不想再重新输入一遍要搜索的内容，希望能够直接切换引擎搜索刚才的内容。
+command! -nargs=? -complete=search switchenginesearch exe 'o <args> ' + (buffer.lastInputField?buffer.lastInputField.value:'')
+
+" 用google站内搜索API搜索当前站点
+command! -nargs=* sitesearch exe "t http://www.google.com/search?q=" + encodeURIComponent("<args>") + "&sitesearch=" + window.content.location.hostname
+
+" 用baidu站内搜索API搜索当前站点
+command! -nargs=* sitesearchbd exe "t http://www.baidu.com/s?ie=utf-8&word=" + encodeURIComponent("<args> site:" + window.content.location.hostname);
+
+" =================================================
+" Alias: {{{1
+" =================================================
+" lazy alias vimperatorrc vimp
+
+" vim: set sw=4 ts=4 sts=4 ft=vim syntax=vim foldmethod=marker:
